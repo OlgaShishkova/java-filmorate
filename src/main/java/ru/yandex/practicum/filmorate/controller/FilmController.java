@@ -18,7 +18,6 @@ import java.util.HashMap;
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
-//    private final static Logger log = LoggerFactory.getLogger(FilmController.class);
     private int filmId;
     private final HashMap<Integer, Film> films = new HashMap<>();
 
