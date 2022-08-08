@@ -23,9 +23,7 @@ public class UserController {
     @PostMapping
     public User create(@RequestBody @Valid User user) {
         user.setId(++userId);
-        if (user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+        checkName(user);
         users.put(user.getId(), user);
         log.info("Добавлен пользователь: {}", user.getEmail());
         return user;
@@ -36,9 +34,16 @@ public class UserController {
         if(!users.containsKey(user.getId())) {
             throw new UserNotFoundException("Пользователь не найден.");
         }
+        checkName(user);
         users.put(user.getId(), user);
         log.info("Обновлен пользователь: {}", user.getEmail());
         return user;
+    }
+
+    private void checkName(User user) {
+        if (user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 
     @GetMapping
