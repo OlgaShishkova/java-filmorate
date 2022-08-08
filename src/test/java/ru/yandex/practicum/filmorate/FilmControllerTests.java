@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.FilmAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -53,14 +52,5 @@ public class FilmControllerTests {
                 FilmNotFoundException.class,
                 () -> filmController.update(film));
         assertEquals("Фильм не найден.", ex.getMessage());
-    }
-
-    @Test
-    public void filmReleaseDateShouldBeLaterException() {
-        film.setReleaseDate(LocalDate.of(1890, 1, 1));
-        ValidationException ex = assertThrows(
-                ValidationException.class,
-                () -> filmController.add(film));
-        assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года.", ex.getMessage());
     }
 }

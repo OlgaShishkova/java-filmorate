@@ -13,11 +13,11 @@ public class User {
     private Integer id;
     @Email(message = "Электронная почта не может быть пустой и должна содержать символ @")
     private String email;
-    @NotBlank(message = "Логин не может быть пустым и содержать пробелы.")
+    @NotBlank(message = "Логин не может быть пустым и содержать пробелы")
     private String login;
     @EqualsAndHashCode.Exclude
     private String name;
-    @PastOrPresent(message = "Дата рождения не может быть в будущем.")
+    @PastOrPresent(message = "Дата рождения не может быть в будущем")
     @EqualsAndHashCode.Exclude
     private LocalDate birthday;
 }

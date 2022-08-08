@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -31,16 +30,6 @@ public class UserControllerTests {
     public void shouldCreateUser() {
         userController.create(user);
         Assertions.assertEquals(userController.getAll().size(), 1);
-    }
-
-    @Test
-    public void shouldThrowUserAlreadyExistException() {
-        userController.create(user);
-        user.setName("newName");
-        UserAlreadyExistException ex = assertThrows(
-                UserAlreadyExistException.class,
-                () -> userController.create(user));
-        assertEquals("Такой пользователь уже существует.", ex.getMessage());
     }
 
     @Test
