@@ -23,7 +23,7 @@ public class UserControllerTests {
         user.setLogin("Login");
         user.setEmail("name@mail.ru");
         user.setBirthday(LocalDate.of(1960, 5, 25));
-        userController = new UserController();
+//        userController = new UserController();
     }
 
     @Test

@@ -24,13 +24,13 @@ public class FilmControllerTests {
         film.setDescription("filmDescription");
         film.setDuration(120);
         film.setReleaseDate(LocalDate.of(1990, 2, 23));
-        filmController = new FilmController();
+//        filmController = new FilmController();
     }
 
     @Test
     public void shouldAddFilm() {
         filmController.add(film);
-        Assertions.assertEquals(filmController.getAll().size(), 1);
+        Assertions.assertEquals(filmController.findAll().size(), 1);
     }
 
     @Test
