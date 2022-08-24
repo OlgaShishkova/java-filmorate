@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmAlreadyExistException;
@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -17,7 +18,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film add(Film film) {
         if (films.containsValue(film)) {
-            throw new FilmAlreadyExistException("Такой фильм уже существует.");
+            throw new FilmAlreadyExistException("Такой фильм уже существует");
         }
         film.setId(++filmId);
         films.put(film.getId(), film);
@@ -32,7 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         if (!films.containsKey(film.getId())) {
-            throw new FilmNotFoundException("Фильм не найден.");
+            throw new FilmNotFoundException("Фильм не найден");
         }
         films.put(film.getId(), film);
         return film;
@@ -42,4 +43,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Collection<Film> findAll() {
         return films.values();
     }
+
+    @Override
+    public Optional<Film> findById(int id) {
+        if (!films.containsKey(id)) {
+            throw new FilmNotFoundException("Фильм не найден");
+        }
+        return Optional.ofNullable(films.get(id));
+    }
+
 }
