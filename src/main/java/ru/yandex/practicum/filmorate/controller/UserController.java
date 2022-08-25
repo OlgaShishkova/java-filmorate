@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -28,27 +26,27 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody @Valid User user) {
-        return userService.userStorage.create(user);
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody @Valid User user) {
-        return userService.userStorage.update(user);
+        return userService.update(user);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        userService.userStorage.delete(id);
+        userService.delete(id);
     }
 
     @GetMapping
-    public Collection<User> getAll() {
-        return userService.userStorage.findAll();
+    public List<User> findAll() {
+        return userService.findAll();
     }
 
     @GetMapping("/{id}")
     public User findById(@PathVariable long id) {
-        return userService.userStorage.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        return userService.findById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

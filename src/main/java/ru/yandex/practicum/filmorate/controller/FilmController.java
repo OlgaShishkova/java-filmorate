@@ -2,17 +2,18 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
 @Slf4j
+@Validated
 @RequestMapping("/films")
 public class FilmController {
 
@@ -26,27 +27,27 @@ public class FilmController {
 
     @PostMapping
     public Film add(@RequestBody @Valid Film film) {
-        return filmService.filmStorage.add(film);
+        return filmService.add(film);
     }
 
     @PutMapping
     public Film update(@RequestBody @Valid Film film) {
-        return filmService.filmStorage.update(film);
+        return filmService.update(film);
     }
 
     @GetMapping
-    public Collection<Film> findAll() {
-        return filmService.filmStorage.findAll();
+    public List<Film> findAll() {
+        return filmService.findAll();
     }
 
     @DeleteMapping("/{id}")
     public void remove(@PathVariable int id) {
-        filmService.filmStorage.remove(id);
+        filmService.remove(id);
     }
 
     @GetMapping("/{id}")
     public Film findById(@PathVariable int id) {
-        return filmService.filmStorage.findById(id).orElseThrow(() -> new FilmNotFoundException("Фильм не найден"));
+        return filmService.findById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -60,7 +61,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopular(@RequestParam(defaultValue = "10", required = false) int count) {
+    public List<Film> getPopular(@RequestParam(defaultValue = "10", required = false) @Positive int count) {
         return filmService.getPopular(count);
     }
 }
