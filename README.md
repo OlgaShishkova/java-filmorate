@@ -28,6 +28,7 @@ SELECT u.login
 
 FROM user AS u
 
-INNER JOIN friendship_status AS f ON f.user_id = user.user_id
+INNER JOIN friendship_status AS f ON f.friend_id = u.user_id
+
 
 WHERE f.user_id = 'N';
