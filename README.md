@@ -1,6 +1,6 @@
 # java-filmorate
 
-![This is an image](filmorate_db.jpg)
+![This is an image](filmorate_db.png)
 
 Примеры запросов
 
