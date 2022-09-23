@@ -26,5 +26,9 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration;
     @EqualsAndHashCode.Exclude
+    private FilmGenre[] genre;
+    @EqualsAndHashCode.Exclude
+    private RatingMpa rating;
+    @EqualsAndHashCode.Exclude
     private Set<Long> likes = new HashSet<>();
 }
