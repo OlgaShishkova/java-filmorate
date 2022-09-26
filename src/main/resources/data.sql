@@ -1,4 +1,4 @@
-INSERT INTO rating(name)
+INSERT INTO FILMORATE.PUBLIC.MPA(mpa_name)
 VALUES
     ('G'),
     ('PG'),
@@ -6,7 +6,7 @@ VALUES
     ('R'),
     ('NC-17');
 
-INSERT INTO genres(name)
+INSERT INTO FILMORATE.PUBLIC.GENRES(name)
 VALUES
     ('Комедия'),
     ('Драма'),

@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -56,13 +58,17 @@ public class UserDbStorage implements UserStorage {
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
-        return User.builder()
-                .id(resultSet.getLong("id"))
-                .email(resultSet.getString("email"))
-                .login(resultSet.getString("login"))
-                .name(resultSet.getString("name"))
-                .birthday(resultSet.getDate("birthday").toLocalDate())
-                .build();
+        if (resultSet != null) {
+            return User.builder()
+                    .id(resultSet.getLong("id"))
+                    .email(resultSet.getString("email"))
+                    .login(resultSet.getString("login"))
+                    .name(resultSet.getString("name"))
+                    .birthday(resultSet.getDate("birthday").toLocalDate())
+                    .build();
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -73,20 +79,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Optional<User> findById(long id) {
-        String sqlQuery = "select * from users where id = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id));
-        /*SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where id = ?", id);
-        if(userRows.next()) {
-            return Optional.of(User.builder()
-                    .id(userRows.getLong("id"))
-                    .email(userRows.getString("email"))
-                    .login(userRows.getString("login"))
-                    .name(userRows.getString("name"))
-                    .birthday(userRows.getDate("birthday").toLocalDate())
-                    .build());
-        } else {
-            log.info("Пользователь с идентификатором {} не найден.", id);
+        try {
+            String sqlQuery = "select * from users where id = ?";
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id));
+        } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
-        }*/
+        }
     }
 }
