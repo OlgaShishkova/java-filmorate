@@ -6,7 +6,7 @@ VALUES
     ('R'),
     ('NC-17');
 
-INSERT INTO FILMORATE.PUBLIC.GENRES(name)
+INSERT INTO FILMORATE.PUBLIC.GENRES(genre_name)
 VALUES
     ('Комедия'),
     ('Драма'),

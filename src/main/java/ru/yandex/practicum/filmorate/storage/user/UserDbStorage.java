@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.user;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -26,7 +25,7 @@ public class UserDbStorage implements UserStorage {
         checkName(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
-                .usingGeneratedKeyColumns("id");
+                .usingGeneratedKeyColumns("user_id");
         user.setId(simpleJdbcInsert.executeAndReturnKey(user.toMap()).longValue());
         return user;
     }
@@ -38,7 +37,7 @@ public class UserDbStorage implements UserStorage {
     }
     @Override
     public void delete(long id) {
-        String sqlQuery = "delete from users where id = ?";
+        String sqlQuery = "delete from users where user_id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }
 
@@ -47,7 +46,7 @@ public class UserDbStorage implements UserStorage {
         checkName(user);
         String sqlQuery = "update users set " +
                 "email = ?, login = ?, name = ?, birthday = ? " +
-                "where id = ?";
+                "where user_id = ?";
         jdbcTemplate.update(sqlQuery,
                 user.getEmail(),
                 user.getLogin(),
@@ -60,7 +59,7 @@ public class UserDbStorage implements UserStorage {
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         if (resultSet != null) {
             return User.builder()
-                    .id(resultSet.getLong("id"))
+                    .id(resultSet.getLong("user_id"))
                     .email(resultSet.getString("email"))
                     .login(resultSet.getString("login"))
                     .name(resultSet.getString("name"))
@@ -73,14 +72,14 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> findAll() {
-            String sqlQuery = "select id, email, login, name, birthday from users";
+            String sqlQuery = "select * from users";
             return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
     public Optional<User> findById(long id) {
         try {
-            String sqlQuery = "select * from users where id = ?";
+            String sqlQuery = "select * from users where user_id = ?";
             return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();

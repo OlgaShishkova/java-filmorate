@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.film;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -27,7 +26,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film add(Film film) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
-                .usingGeneratedKeyColumns("id");
+                .usingGeneratedKeyColumns("film_id");
         film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue());
         updateFilmGenreTable(film);
         return film;
@@ -36,8 +35,8 @@ public class FilmDbStorage implements FilmStorage {
     private void updateFilmGenreTable(Film film) {
         String sqlQuery = "delete from film_genre where film_id = ?";
         jdbcTemplate.update(sqlQuery, film.getId());
-        if (film.getGenre() != null) {
-            for (Genre genre : film.getGenre()) {
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
                 sqlQuery = "insert into film_genre(film_id, genre_id) " +
                         "values (?, ?)";
                 jdbcTemplate.update(sqlQuery,
@@ -49,7 +48,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void remove(int id) {
-        String sqlQuery = "delete from films where id = ?";
+        String sqlQuery = "delete from films where film_id = ?";
         jdbcTemplate.update(sqlQuery, id);
         sqlQuery = "delete from film_genre where film_id = ?";
         jdbcTemplate.update(sqlQuery, id);
@@ -61,7 +60,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film update(Film film) {
         String sqlQuery = "update films set " +
                 "name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? " +
-                "where id = ?";
+                "where film_id = ?";
         jdbcTemplate.update(sqlQuery,
                 film.getName(),
                 film.getDescription(),
@@ -75,7 +74,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
-                .id(resultSet.getInt("id"))
+                .id(resultSet.getInt("film_id"))
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
@@ -84,19 +83,29 @@ public class FilmDbStorage implements FilmStorage {
                         .id(resultSet.getInt("mpa_id"))
                         .name(resultSet.getString("mpa_name"))
                         .build())
+                .genres(findGenresByFilmId(resultSet.getInt("film_id")))
                 .build();
     }
 
+    private List<Genre> findGenresByFilmId(int id) {
+        String sqlQuery = "select fg.genre_id, g.genre_name from film_genre as fg " +
+                "left join genres as g on g.genre_id = fg.genre_id " +
+                "where film_id = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);
+    }
     @Override
     public List<Film> findAll() {
-        String sqlQuery = "select * from films as f left join mpa as m on f.mpa_id = m.mpa_id";
+        String sqlQuery = "select * from films as f " +
+                "left join mpa as m on f.mpa_id = m.mpa_id ";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
     @Override
     public Optional<Film> findById(int id) {
         try {
-            String sqlQuery = "select * from films as f left join mpa as m on f.mpa_id = m.mpa_id where id = ?";
+            String sqlQuery = "select * from films as f " +
+                    "left join mpa as m on f.mpa_id = m.mpa_id " +
+                    "where film_id = ?";
             return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -105,8 +114,8 @@ public class FilmDbStorage implements FilmStorage {
 
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
         return Genre.builder()
-                .id(resultSet.getInt("id"))
-                .name(resultSet.getString("name"))
+                .id(resultSet.getInt("genre_id"))
+                .name(resultSet.getString("genre_name"))
                 .build();
     }
 
@@ -120,7 +129,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Optional<Genre> getGenreById(int id) {
         try {
-            String sqlQuery = "select * from genres where id = ?";
+            String sqlQuery = "select * from genres where genre_id = ?";
             return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();

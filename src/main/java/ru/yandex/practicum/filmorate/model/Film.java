@@ -27,7 +27,7 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration;
     @EqualsAndHashCode.Exclude
-    private List<Genre> genre;
+    private List<Genre> genres;
     @EqualsAndHashCode.Exclude
     private Mpa mpa;
     @EqualsAndHashCode.Exclude
