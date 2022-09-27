@@ -29,16 +29,22 @@ public class FilmService {
         if(userStorage.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
-        findById(filmId).getLikes().add(userId);
-        return findById(filmId).getLikes().size();
+        if(filmStorage.findById(filmId).isEmpty()) {
+            throw new NotFoundException("Фильм не найден");
+        }
+        return filmStorage.addLike(filmId, userId);
     }
 
-    public int deleteLike(int filmId, long userId) {
+    public int removeLike(int filmId, long userId) {
         if(userStorage.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
-        findById(filmId).getLikes().remove(userId);
-        return findById(filmId).getLikes().size();
+        if(filmStorage.findById(filmId).isEmpty()) {
+            throw new NotFoundException("Фильм не найден");
+        }
+        return filmStorage.removeLike(filmId, userId);
+//        findById(filmId).getLikes().remove(userId);
+//        return findById(filmId).getLikes().size();
     }
 
     public List<Film> getPopular(int count) {

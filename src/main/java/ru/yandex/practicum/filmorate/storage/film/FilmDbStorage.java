@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -147,5 +148,25 @@ public class FilmDbStorage implements FilmStorage {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public int addLike(int filmId, long userId) {
+        String sqlQuery = "select count(*) from film_likes where film_id = ? and user_id = ?";
+        if (jdbcTemplate.queryForObject(sqlQuery, Integer.class, filmId, userId) == 0) {
+            sqlQuery = "insert into film_likes(film_id, user_id) " +
+                    "values (?, ?)";
+            jdbcTemplate.update(sqlQuery, filmId, userId);
+        }
+        return jdbcTemplate.queryForObject(
+                "select count(*) from film_likes where film_id = ?", Integer.class, filmId);
+    }
+
+    @Override
+    public int removeLike(int filmId, long userId) {
+        String sqlQuery = "delete from film_likes where film_id = ? and user_id = ?";
+            jdbcTemplate.update(sqlQuery, filmId, userId);
+        return jdbcTemplate.queryForObject(
+                "select count(*) from film_likes where film_id = ?", Integer.class, filmId);
     }
 }

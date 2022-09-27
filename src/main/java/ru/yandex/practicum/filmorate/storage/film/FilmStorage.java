@@ -21,4 +21,8 @@ public interface FilmStorage {
     List<Mpa> getMpa();
 
     Optional<Mpa> getMpaById(int id);
+
+    int addLike(int filmId, long userId);
+
+    int removeLike(int filmId, long userId);
 }
