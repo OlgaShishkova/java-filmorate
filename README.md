@@ -1,6 +1,6 @@
 # java-filmorate
 
-![filmorate_db](https://user-images.githubusercontent.com/102627749/192576602-a9958047-26ae-4c84-94ea-7267b25af37e.png)
+![filmorate_db](https://user-images.githubusercontent.com/102627749/192586189-f628056b-4345-453b-9e93-6dea25773c18.png)
 
 
 Примеры запросов
@@ -8,28 +8,21 @@
 Получение всех фильмов:
 
 SELECT name
-
-FROM film;
-
+FROM films;
 
 Получение топ-N популярных фильмов:
 
-SELECT name,
-       likes
-       
-FROM film
-
+SELECT f.name,
+       count(fl.user_id) as likes       
+FROM films as f
+LEFT JOIN film_likes as fl ON f.film_id = fl.film_id
+GROUP BY f.name
 ORDER BY likes DESC
-
 LIMIT N;
 
 Получение списка друзей у пользователя N:
 
 SELECT u.login
-
-FROM user AS u
-
-INNER JOIN friendship_status AS f ON f.friend_id = u.user_id
-
-
-WHERE f.user_id = 'N';
+FROM users AS u
+INNER JOIN user_friends AS uf ON uf.friend_id = u.user_id
+WHERE uf.user_id = 'N';
