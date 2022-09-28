@@ -70,4 +70,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         return 0;
     }
 
+    @Override
+    public List<Film> getPopular (int count) {
+        return null;
+    }
+
 }

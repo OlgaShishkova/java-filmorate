@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,5 +85,33 @@ public class UserDbStorage implements UserStorage {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public int addFriend(long userId, long friendId) {
+        String sqlQuery = "select count(*) from user_friends where user_id = ? and friend_id = ?";
+        if(jdbcTemplate.queryForObject(sqlQuery, Integer.class, userId, friendId) == 0) {
+            sqlQuery = "insert into user_friends(user_id, friend_id) values (?, ?)";
+            jdbcTemplate.update(sqlQuery, userId, friendId);
+        }
+        return jdbcTemplate.queryForObject(
+                "select count(*) from user_friends where user_id = ?", Integer.class, userId);
+    }
+
+    @Override
+    public int removeFriend(long userId, long friendId) {
+        String sqlQuery = "delete from user_friends where user_id = ? and friend_id = ?";
+        jdbcTemplate.update(sqlQuery, userId, friendId);
+        return jdbcTemplate.queryForObject(
+                "select count(*) from user_friends where user_id = ?", Integer.class, userId);
+    }
+
+    @Override
+    public List<User> getFriends(long id) {
+        String sqlQuery = "select u.user_id, u.email, u.login, u.name, u.birthday " +
+                "from user_friends as uf " +
+                "left join users u on u.user_id = uf.friend_id" +
+                " where uf.user_id = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
     }
 }

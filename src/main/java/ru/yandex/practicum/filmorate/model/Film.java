@@ -30,8 +30,8 @@ public class Film {
     private List<Genre> genres;
     @EqualsAndHashCode.Exclude
     private Mpa mpa;
-    @EqualsAndHashCode.Exclude
-    private Set<Long> likes = new HashSet<>();
+//    @EqualsAndHashCode.Exclude
+//    private Set<Long> likes;
 
     public Map<String,Object> toMap() {
         Map<String, Object> values = new HashMap<>();

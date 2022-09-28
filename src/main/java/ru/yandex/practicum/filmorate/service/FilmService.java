@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -43,15 +42,14 @@ public class FilmService {
             throw new NotFoundException("Фильм не найден");
         }
         return filmStorage.removeLike(filmId, userId);
-//        findById(filmId).getLikes().remove(userId);
-//        return findById(filmId).getLikes().size();
     }
 
     public List<Film> getPopular(int count) {
-        return filmStorage.findAll().stream()
-                .sorted((f1, f2) -> f2.getLikes().size() - f1.getLikes().size())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopular(count);
+//        return filmStorage.findAll().stream()
+//                .sorted((f1, f2) -> f2.getLikes().size() - f1.getLikes().size())
+//                .limit(count)
+//                .collect(Collectors.toList());
     }
 
     public Film findById(int id) {

@@ -13,16 +13,11 @@ public interface FilmStorage {
     Film update(Film film);
     List<Film> findAll();
     Optional<Film> findById(int id);
-
     List<Genre> getGenres();
-
     Optional<Genre> getGenreById(int id);
-
     List<Mpa> getMpa();
-
     Optional<Mpa> getMpaById(int id);
-
     int addLike(int filmId, long userId);
-
     int removeLike(int filmId, long userId);
+    List<Film> getPopular(int count);
 }

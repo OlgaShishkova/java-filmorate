@@ -21,27 +21,29 @@ public class UserService {
     }
 
     public int addFriend(long userId, long friendId) {
-        if (userId != friendId) {
-            findById(friendId).getFriends().add(userId);
-            findById(userId).getFriends().add(friendId);
+        if (userStorage.findById(userId).isEmpty() ||
+        userStorage.findById(friendId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
         }
-        return findById(userId).getFriends().size();
+        return userStorage.addFriend(userId, friendId);
     }
 
-    public int deleteFriend(long userId, long friendId) {
-        findById(friendId).getFriends().remove(userId);
-        findById(userId).getFriends().remove(friendId);
-        return findById(userId).getFriends().size();
+    public int removeFriend(long userId, long friendId) {
+        return userStorage.removeFriend(userId, friendId);
     }
 
-    public List<User> getFriends(long id) {
-        return findById(id).getFriends().stream().map(this::findById).collect(Collectors.toList());
+    public List<User> getFriends(Long id) {
+        return userStorage.getFriends(id);
+//        return findById(id).getFriends().stream().map(this::findById).collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long userId, long friendId) {
-        List<Long> commonFriends = new ArrayList<>(findById(userId).getFriends());
-        commonFriends.retainAll(findById(friendId).getFriends());
-        return commonFriends.stream().map(this::findById).collect(Collectors.toList());
+        List<User> commonFriends = userStorage.getFriends(userId);
+        commonFriends.retainAll(userStorage.getFriends(friendId));
+        return commonFriends;
+//        List<Long> commonFriends = new ArrayList<>(findById(userId).getFriends());
+//        commonFriends.retainAll(findById(friendId).getFriends());
+//        return commonFriends.stream().map(this::findById).collect(Collectors.toList());
     }
 
     public List<User> findAll() {

@@ -11,4 +11,7 @@ public interface UserStorage {
     User update(User user);
     List<User> findAll();
     Optional<User> findById(long id);
+    int addFriend(long userId, long friendId);
+    int removeFriend(long userId, long friendId);
+    List<User> getFriends(long id);
 }

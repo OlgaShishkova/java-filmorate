@@ -26,8 +26,8 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     @EqualsAndHashCode.Exclude
     private LocalDate birthday;
-    @EqualsAndHashCode.Exclude
-    private Set<Long> friends = new HashSet<>();
+//    @EqualsAndHashCode.Exclude
+//    private Set<Long> friends = new HashSet<>();
 
     public Map<String, Object> toMap() {
         Map<String, Object> values = new HashMap<>();
