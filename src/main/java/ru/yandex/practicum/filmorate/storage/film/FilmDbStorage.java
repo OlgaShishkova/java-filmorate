@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
@@ -36,6 +37,7 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "delete from film_genres where film_id = ?";
         jdbcTemplate.update(sqlQuery, film.getId());
         if (film.getGenres() != null) {
+            film.setGenres(film.getGenres().stream().distinct().collect(Collectors.toList()));
             for (Genre genre : film.getGenres()) {
                 sqlQuery = "insert into film_genres(film_id, genre_id) " +
                         "values (?, ?)";
@@ -92,17 +94,14 @@ public class FilmDbStorage implements FilmStorage {
     }
     @Override
     public List<Film> findAll() {
-        String sqlQuery = "select * from films as f " +
-                "left join mpa as m on f.mpa_id = m.mpa_id ";
+        String sqlQuery = "select * from films";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
     @Override
     public Optional<Film> findById(int id) {
         try {
-            String sqlQuery = "select * from films as f " +
-//                    "left join mpa as m on f.mpa_id = m.mpa_id " +
-                    "where film_id = ?";
+            String sqlQuery = "select * from films as f where film_id = ?";
             return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
