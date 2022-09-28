@@ -1,7 +1,7 @@
 # java-filmorate
 
-![filmorate_db](https://user-images.githubusercontent.com/102627749/192760571-74e8e463-0218-4dc1-9c74-5c51ba76d993.png)
 
+![](../../../../Ольга/Java Yandex.Practicum/filmorate_db2.png)
 Примеры запросов
 
 Получение всех фильмов:
