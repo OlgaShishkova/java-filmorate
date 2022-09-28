@@ -124,17 +124,13 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopular (int count) {
-//        try {
-            String sqlQuery = "select f.* from films as f " +
-                    "left join film_likes as fl on fl.film_id = f.film_id " +
-                    "group by fl.film_id " +
-                    "order by count(fl.user_id) desc " +
-                    "limit ?";
-            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
-//        } catch (EmptyResultDataAccessException e) {
-//            return null;
-//        }
-
+        String sqlQuery = "select f.*, count(fl.user_id) as likes_count " +
+                "from films as f " +
+                "left join film_likes as fl on fl.film_id = f.film_id " +
+                "group by f.film_id " +
+                "order by likes_count desc " +
+                "limit ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
 
