@@ -8,8 +8,9 @@ import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.impl.FilmDaoImpl;
+import ru.yandex.practicum.filmorate.dao.GenreDao;
+import ru.yandex.practicum.filmorate.impl.UserDaoImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 
 class FilmorateApplicationTests {
-    private final UserDbStorage userStorage;
-    private final FilmDbStorage filmStorage;
+    private final UserDaoImpl userStorage;
+    private final FilmDaoImpl filmStorage;
+    private final GenreDao genreDao;
     @Test
     public void testFindUserById() {
         List<User> users = userStorage.findAll();
@@ -73,7 +75,7 @@ class FilmorateApplicationTests {
 
     @Test
     public void testGetGenreById() {
-        Optional<Genre> genreOptional = filmStorage.getGenreById(1);
+        Optional<Genre> genreOptional = genreDao.getGenreById(1);
         assertThat(genreOptional)
                 .isPresent()
                 .hasValueSatisfying(genre ->

@@ -28,10 +28,9 @@ public class Film {
     private int duration;
     @EqualsAndHashCode.Exclude
     private List<Genre> genres;
+    @NotNull
     @EqualsAndHashCode.Exclude
     private Mpa mpa;
-//    @EqualsAndHashCode.Exclude
-//    private Set<Long> likes;
 
     public Map<String,Object> toMap() {
         Map<String, Object> values = new HashMap<>();

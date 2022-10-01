@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -11,8 +9,6 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@Validated
-@Slf4j
 @RequestMapping("/users")
 public class UserController {
 
@@ -26,12 +22,20 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody @Valid User user) {
+        checkName(user);
         return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody @Valid User user) {
+        checkName(user);
         return userService.update(user);
+    }
+
+    private void checkName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 
     @DeleteMapping("/{id}")
