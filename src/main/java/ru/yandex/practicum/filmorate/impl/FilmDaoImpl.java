@@ -4,11 +4,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.dao.GenreDao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,15 +16,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component//("filmDbStorage")
+@Repository
 public class FilmDaoImpl implements FilmDao {
 
     private final JdbcTemplate jdbcTemplate;
-    private final GenreDao genreDao;
 
-    public FilmDaoImpl(JdbcTemplate jdbcTemplate, GenreDao genreDao) {
+    public FilmDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.genreDao = genreDao;
     }
 
     @Override
@@ -38,32 +35,9 @@ public class FilmDaoImpl implements FilmDao {
         return film;
     }
 
-    private void updateFilmGenreTable(Film film) {
-        String sqlQuery = "delete from film_genres where film_id = ?";
-        jdbcTemplate.update(sqlQuery, film.getId());
-        if (film.getGenres() != null) {
-            film.setGenres(film.getGenres().stream().distinct().collect(Collectors.toList()));
-            sqlQuery = "insert into film_genres(film_id, genre_id) " +
-                    "values (?, ?)";
-            jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ps.setInt(1, film.getId());
-                    ps.setInt(2, film.getGenres().get(i).getId());
-                }
-                public int getBatchSize() {
-                    return film.getGenres().size();
-                }
-            });
-        }
-    }
-
     @Override
     public void remove(int id) {
         String sqlQuery = "delete from films where film_id = ?";
-        jdbcTemplate.update(sqlQuery, id);
-        sqlQuery = "delete from film_genres where film_id = ?";
-        jdbcTemplate.update(sqlQuery, id);
-        sqlQuery = "delete from film_likes where film_id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }
 
@@ -83,24 +57,11 @@ public class FilmDaoImpl implements FilmDao {
         return film;
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(resultSet.getInt("film_id"))
-                .name(resultSet.getString("name"))
-                .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .duration(resultSet.getInt("duration"))
-                .mpa(new Mpa (resultSet.getInt("mpa_id"),
-                              resultSet.getString("mpa_name")))
-                .genres(genreDao.getGenresByFilmId(resultSet.getInt("film_id")))
-                .build();
-    }
-
     @Override
     public List<Film> findAll() {
         String sqlQuery = "select * from films as f " +
                 "left join mpa as m on f.mpa_id = m.mpa_id";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+        return jdbcTemplate.query(sqlQuery, FilmDaoImpl::mapRowToFilm);
     }
 
     @Override
@@ -109,7 +70,7 @@ public class FilmDaoImpl implements FilmDao {
             String sqlQuery = "select * from films as f " +
                     "left join mpa as m on f.mpa_id = m.mpa_id " +
                     "where film_id = ?";
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id));
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, FilmDaoImpl::mapRowToFilm, id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -124,7 +85,38 @@ public class FilmDaoImpl implements FilmDao {
                 "group by f.film_id " +
                 "order by likes_count desc " +
                 "limit ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+        return jdbcTemplate.query(sqlQuery, FilmDaoImpl::mapRowToFilm, count);
+    }
+
+    protected static Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(resultSet.getInt("film_id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .duration(resultSet.getInt("duration"))
+                .mpa(new Mpa (resultSet.getInt("mpa_id"),
+                        resultSet.getString("mpa_name")))
+                .build();
+    }
+
+    private void updateFilmGenreTable(Film film) {
+        String sqlQuery = "delete from film_genres where film_id = ?";
+        jdbcTemplate.update(sqlQuery, film.getId());
+        if (film.getGenres() != null) {
+            film.setGenres(film.getGenres().stream().distinct().collect(Collectors.toList()));
+            sqlQuery = "insert into film_genres(film_id, genre_id) " +
+                    "values (?, ?)";
+            jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, film.getId());
+                    ps.setInt(2, film.getGenres().get(i).getId());
+                }
+                public int getBatchSize() {
+                    return film.getGenres().size();
+                }
+            });
+        }
     }
 
 }

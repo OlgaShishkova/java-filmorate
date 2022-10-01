@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.impl;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-@Component//("userDbStorage")
+@Repository
 public class UserDaoImpl implements UserDao {
 
     private final JdbcTemplate jdbcTemplate;
@@ -50,7 +50,23 @@ public class UserDaoImpl implements UserDao {
         return user;
     }
 
-    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+    @Override
+    public List<User> findAll() {
+            String sqlQuery = "select * from users";
+            return jdbcTemplate.query(sqlQuery, UserDaoImpl::mapRowToUser);
+    }
+
+    @Override
+    public Optional<User> findById(long id) {
+        try {
+            String sqlQuery = "select * from users where user_id = ?";
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, UserDaoImpl::mapRowToUser, id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    protected static User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         if (resultSet != null) {
             return User.builder()
                     .id(resultSet.getLong("user_id"))
@@ -61,22 +77,6 @@ public class UserDaoImpl implements UserDao {
                     .build();
         } else {
             return null;
-        }
-    }
-
-    @Override
-    public List<User> findAll() {
-            String sqlQuery = "select * from users";
-            return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
-    }
-
-    @Override
-    public Optional<User> findById(long id) {
-        try {
-            String sqlQuery = "select * from users where user_id = ?";
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id));
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
         }
     }
 }
