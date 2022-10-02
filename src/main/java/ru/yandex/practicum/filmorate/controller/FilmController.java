@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
-@Slf4j
 @Validated
 @RequestMapping("/films")
 public class FilmController {
@@ -56,8 +54,8 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public int deleteLike(@PathVariable int id, @PathVariable long userId) {
-        return filmService.deleteLike(id, userId);
+    public int removeLike(@PathVariable int id, @PathVariable long userId) {
+        return filmService.removeLike(id, userId);
     }
 
     @GetMapping("/popular")

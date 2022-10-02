@@ -1,6 +1,6 @@
 # java-filmorate
 
-![filmorate_db](https://user-images.githubusercontent.com/102627749/192586189-f628056b-4345-453b-9e93-6dea25773c18.png)
+![filmorate_db2](https://user-images.githubusercontent.com/102627749/192827757-15f8f78c-f6d9-48f8-8ec4-f16a5cbbf569.png)
 
 
 Примеры запросов
